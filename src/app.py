@@ -36,14 +36,38 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
-
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+# @app.route('/user', methods=['GET'])
+# def handle_hello():
+#     data = request.get_json()
+#     if not data:
+#         return jsonify({"error": "No data provided"}), 400
+#     new_user=User(data)
+#     response_body = {
+#         new_user
+#         # "msg": "Hello, this is your GET /user response "
+#     }
 
     return jsonify(response_body), 200
+
+@app.route('/user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    email = data.get('email')
+    password = data.get('password')
+    is_active = data.get('is_active', True) 
+    
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+    
+    new_user = User(email=email, password=password, is_active=is_active)
+    response_body = new_user.serialize()
+    return jsonify(response_body), 201
+    
+
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
