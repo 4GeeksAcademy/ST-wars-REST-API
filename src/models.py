@@ -26,7 +26,7 @@ class User(db.Model):
 
 class Planets(db.Model):
     __tablename__="planets"
-    planet_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     diameter = db.Column(db.Integer, nullable=False)
     climate = db.Column(db.String(150), nullable=False)
     terrain = db.Column(db.String(150), nullable=False)
@@ -39,9 +39,33 @@ class Planets(db.Model):
             "climate":self.climate,
             "terrain":self.terrain
         }
+class People(db.Model):
+    __tablename__="people"
+    people_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(120), nullable=False)
+    eye_color = db.Column(db.String(150), nullable=False)
+    skin_color = db.Column(db.String(150), nullable=False)
+    favorite= db.relationship("Favorites", backref= "people", lazy=True)
+
+    def serialize(self):
+        return {
+            "id": self.people_id,
+            "name": self.name,
+            "eye_color":self.eye_color,
+            "skin_color":self.skin_color
+        }
+
     
 class Favorites(db.Model):
     __tablename__="favorites"
     id = db.Column(db.Integer, primary_key=True,)
     user_fk= db.Column(db.Integer, db.ForeignKey("user.id")) 
-    planet_fk= db.Column(db.Integer, db.ForeignKey("planets.planet_id")) 
+    planet_fk= db.Column(db.Integer, db.ForeignKey("planets.id")) 
+    people_fk= db.Column(db.Integer, db.ForeignKey("people.people_id"))  
+    
+    def serialize(self):
+        return {
+            "user": self.user_fk,
+            "planets":self.planet_fk,
+            "people":self.people_fk
+        }
